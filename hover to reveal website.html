@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hover Reveal Notes</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #1e1e2f;
+      color: #d4d4d4;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .note {
+      margin: 1rem 0;
+    }
+
+    .spoiler {
+      background-color: #2d2d3a;
+      color: #2d2d3a;
+      border-radius: 4px;
+      padding: 0 0.3rem;
+      transition: color 0.3s ease;
+      cursor: pointer;
+    }
+
+    .spoiler:hover,
+    .spoiler.revealed {
+      color: #ffffff;
+    }
+
+    h1, h2 {
+      color: #ffffff;
+    }
+
+    .toggle-btn {
+      background-color: #3a3a4d;
+      color: #ffffff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 1.5rem;
+    }
+
+    .toggle-btn:hover {
+      background-color: #50506b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hover-to-Reveal Notes</h1>
+<div class="note"> Paste your notes here with <u>span class="spoiler"</u> to hide all the answers. Use bold-to-spoiler converter for easier use. Click reveal all button below to see all the answers. <br> <3 <br></div>
+    <button class="toggle-btn" onclick="toggleReveal()">Reveal All</button>
+
+<h2> Critical Care Notes</h2>
+<div class="note">PCO2 values <span class="spoiler">35-45 mm Hg</span><br>HCO3 values <span class="spoiler">22-26 mEq/L</span></div>
+<br>
+<i> Examples below: </i> <br>
+    <div class="note">
+      Photosynthesis happens in the <span class="spoiler">chloroplast</span>.
+    </div>
+    <div class="note">
+      Capital of France: <span class="spoiler">Paris</span>
+    </div>
+    <div class="note">
+      The powerhouse of the cell is the <span class="spoiler">mitochondria</span>.
+    </div>
+  </div>
+
+  <script>
+    let revealed = false;
+
+    function toggleReveal() {
+      const spoilers = document.querySelectorAll('.spoiler');
+      spoilers.forEach(el => {
+        if (revealed) {
+          el.classList.remove('revealed');
+        } else {
+          el.classList.add('revealed');
+        }
+      });
+      revealed = !revealed;
+      document.querySelector('.toggle-btn').textContent = revealed ? 'Hide All' : 'Reveal All';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bold to Spoiler Converter</title>
+  <style>
+    body {
+      background-color: #1e1e2f;
+      color: #d4d4d4;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+    }
+    #input {
+      width: 100%;
+      height: 200px;
+      background-color: #2d2d3a;
+      color: #ffffff;
+      border: none;
+      padding: 1rem;
+      border-radius: 5px;
+      margin-bottom: 1rem;
+      overflow-y: auto;
+    }
+    button {
+      background-color: #3a3a4d;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 0.5rem;
+    }
+    textarea#htmlOutput {
+      background-color: #1a1a2a;
+      color: #d4d4d4;
+      padding: 1rem;
+      margin-top: 0.5rem;
+      border-radius: 5px;
+      font-family: monospace;
+      width: 100%;
+      height: 200px;
+      resize: vertical;
+    }
+    .spoiler {
+      background-color: #2d2d3a;
+      color: #2d2d3a;
+      border-radius: 4px;
+      padding: 0 0.3rem;
+      transition: color 0.3s ease;
+      cursor: pointer;
+    }
+    .spoiler:hover {
+      color: #ffffff;
+    }
+    #copyMessage {
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      color: #90ee90;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      height: 1rem;
+    }
+    #copyMessage.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <h1>Bold to Spoiler Converter</h1>
+  <div contenteditable="true" id="input" placeholder="Paste your notes here..."></div>
+  <button onclick="convert()">Convert</button>
+  <button onclick="copyHTML()">Copy HTML</button>
+
+  <h3>Raw HTML Output:</h3>
+  <div id="copyMessage">Copied to clipboard! ⭐</div>
+  <textarea id="htmlOutput" readonly></textarea>
+
+  <script>
+    function convert() {
+      const inputElement = document.getElementById('input');
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = inputElement.innerHTML;
+
+      const boldElements = tempDiv.querySelectorAll('b, strong, span');
+
+      boldElements.forEach(el => {
+        const isBold = el.tagName === 'B' || el.tagName === 'STRONG' ||
+          (el.style.fontWeight && (el.style.fontWeight === 'bold' || parseInt(el.style.fontWeight) >= 600));
+
+        if (isBold) {
+          const span = document.createElement('span');
+          span.className = 'spoiler';
+          span.innerHTML = el.innerHTML;
+          el.replaceWith(span);
+        }
+      });
+
+      let cleanHTML = tempDiv.innerHTML
+        .replace(/<p[^>]*>/gi, '')
+        .replace(/<\/p>/gi, '\n')
+        .replace(/<o:p>|<\/o:p>/gi, '');
+
+      // Split into lines and join with <br>
+      const lines = cleanHTML.trim().split(/\n+/).map(line => line.trim()).filter(Boolean);
+      const withBreaks = lines.join('<br>');
+      const wrapped = `<div class="note">${withBreaks}</div>`;
+
+      document.getElementById('htmlOutput').value = wrapped;
+    }
+
+    function copyHTML() {
+      const html = document.getElementById('htmlOutput');
+      html.select();
+      html.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(html.value).then(() => {
+        const message = document.getElementById('copyMessage');
+        message.classList.add('visible');
+        setTimeout(() => {
+          message.classList.remove('visible');
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
