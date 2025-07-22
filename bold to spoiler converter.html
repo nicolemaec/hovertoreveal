@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bold to Spoiler Converter</title>
+  <title>Bold to Spoiler with Line Toggle</title>
   <style>
     body {
       background-color: #1e1e2f;
@@ -39,7 +39,7 @@
       border-radius: 5px;
       font-family: monospace;
       width: 100%;
-      height: 200px;
+      height: 400px;
       resize: vertical;
     }
     .spoiler {
@@ -50,7 +50,8 @@
       transition: color 0.3s ease;
       cursor: pointer;
     }
-    .spoiler:hover {
+    .spoiler:hover,
+    .spoiler.revealed {
       color: #ffffff;
     }
     #copyMessage {
@@ -67,12 +68,12 @@
   </style>
 </head>
 <body>
-  <h1>Bold to Spoiler Converter</h1>
-  <div contenteditable="true" id="input" placeholder="Paste your notes here..."></div><br>
+  <h1>Bold to Spoiler + Line Toggle Generator</h1>
+  <div contenteditable="true" id="input" placeholder="Paste your notes here..."></div>
   <button onclick="convert()">Convert</button>
   <button onclick="copyHTML()">Copy HTML</button>
 
-  <h3>Raw HTML Output:</h3>
+  <h3>Generated HTML Output:</h3>
   <div id="copyMessage">Copied to clipboard! ⭐</div>
   <textarea id="htmlOutput" readonly></textarea>
 
@@ -82,12 +83,19 @@
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = inputElement.innerHTML;
 
-      const boldElements = tempDiv.querySelectorAll('b, strong, span');
+      // Remove Microsoft Word junk
+      const garbageSpans = tempDiv.querySelectorAll('span');
+      garbageSpans.forEach(el => {
+        if (el.style && Object.keys(el.style).length > 0) {
+          el.removeAttribute('style');
+        }
+      });
 
+      // Convert bolds to spoilers
+      const boldElements = tempDiv.querySelectorAll('b, strong, span');
       boldElements.forEach(el => {
         const isBold = el.tagName === 'B' || el.tagName === 'STRONG' ||
           (el.style.fontWeight && (el.style.fontWeight === 'bold' || parseInt(el.style.fontWeight) >= 600));
-
         if (isBold) {
           const span = document.createElement('span');
           span.className = 'spoiler';
@@ -96,15 +104,36 @@
         }
       });
 
-      let cleanHTML = tempDiv.innerHTML
+      let raw = tempDiv.innerHTML
+        .replace(/<!--.*?-->/gs, '') // remove comment junk
         .replace(/<p[^>]*>/gi, '')
         .replace(/<\/p>/gi, '\n')
-        .replace(/<o:p>|<\/o:p>/gi, '');
+        .replace(/<o:p>|<\/o:p>/gi, '')
+        .replace(/&nbsp;/gi, ' ');
 
-      // Split into lines and join with <br>
-      const lines = cleanHTML.trim().split(/\n+/).map(line => line.trim()).filter(Boolean);
-      const withBreaks = lines.join('<br>');
-      const wrapped = `<div class="note">${withBreaks}</div>`;
+      // Clean up and merge broken lines unless they end in punctuation
+      const lines = raw.split(/\n+/);
+      const merged = [];
+      let current = '';
+      for (let line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        current += (current ? ' ' : '') + trimmed;
+        if (/[.!?]$/.test(trimmed)) {
+          merged.push(current);
+          current = '';
+        }
+      }
+      if (current) merged.push(current);
+
+      // Wrap each in <div class="note">
+      const wrapped = merged.map(line => `
+<div class="note">
+  <label>
+    <input type="checkbox" class="line-toggle" onchange="toggleOne(this)">
+    ${line}
+  </label>
+</div>`).join('\n');
 
       document.getElementById('htmlOutput').value = wrapped;
     }
@@ -120,6 +149,17 @@
           message.classList.remove('visible');
         }, 2000);
       });
+    }
+
+    function toggleOne(checkbox) {
+      const spoiler = checkbox.closest('.note').querySelector('.spoiler');
+      if (spoiler) {
+        if (checkbox.checked) {
+          spoiler.classList.add('revealed');
+        } else {
+          spoiler.classList.remove('revealed');
+        }
+      }
     }
   </script>
 </body>
