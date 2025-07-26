@@ -66,6 +66,40 @@
   scroll-behavior: smooth;
 }
 
+    .floating-nav {
+  position: fixed;
+  top: 2rem;
+  left: 2rem;
+  background: #2d2d3a;
+  padding: 1rem;
+  border-radius: 6px;
+  z-index: 9999;
+}
+
+.floating-nav a {
+  display: block;
+  color: #fff;
+  margin-bottom: 0.5rem;
+  text-decoration: none;
+}
+
+@media screen and (max-width: 600px) {
+  .floating-nav {
+    display: none;
+  }
+}
+
+    .top-link {
+  color: white;
+  text-decoration: none; /* optional: removes underline */
+}
+
+.top-link:hover {
+  text-decoration: underline; /* optional: shows underline on hover */
+}
+
+
+
   </style>
 </head>
 <body>
@@ -74,11 +108,12 @@
     <div class="note">
       Paste your notes here with <u>span class="spoiler"</u> to hide all the answers.<br>
       Use the bold-to-spoiler converter for easier use. Click "Reveal All" to show all answers.<br>
-      <a href="#a1">A1. Critical Care</a> 
+<a href="#a1" class="top-link">A1. Critical Care</a>
 
-      <div style="position: fixed; top: 2rem; left: 2rem; background: #2d2d3a; padding: 1rem; border-radius: 6px;">
-  <a href="#a1" style="color: #fff; display: block; margin-bottom: 0.5rem;">A1. Critical Care</a>
-  <a href="#a2" style="color: #fff;">A2. Sedation</a>
+ <div class="floating-nav">
+  <a href="#a1">A1. Critical Care</a>
+</div>
+
 </div>
 
       ❤️❤️❤️
