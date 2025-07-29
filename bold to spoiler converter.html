@@ -50,7 +50,7 @@
   </style>
 </head>
 <body>
-  <h1>Bold to Spoiler Converter V4</h1>
+  <h1>Bold to Spoiler Converter V4 heart heart</h1>
   <div id="inputArea" contenteditable="true" placeholder="Paste here from Word..."></div>
   <button onclick="convertText()">Convert</button>
   <textarea id="outputText" placeholder="Converted output will appear here..."></textarea>
@@ -75,24 +75,24 @@ html = html.replace(/<(b|strong)>/gi, '<span class="spoiler">');
 html = html.replace(/<\/(b|strong)>/gi, '</span>');
 
 
-// Split ONLY by <br>, but do NOT split inside tables
+// Split ONLY by <br>, but keep tables as single blocks
 const lines = html
   .split(/<br\s*\/?>/i)
   .map(line => line.trim())
   .filter(line => line.length > 0)
   .reduce((result, line) => {
-    if (line.includes('<table') || line.includes('<tr') || line.includes('<td')) {
-      // Append to last item (keep table intact)
-      if (result.length > 0) {
-        result[result.length - 1] += line;
-      } else {
-        result.push(line);
+    if (line.includes('<table')) {
+      const tableMatch = html.match(/<table[\s\S]*?<\/table>/i);
+      if (tableMatch) {
+        result.push(tableMatch[0]);
+        html = html.replace(tableMatch[0], ''); // remove table from remaining HTML
       }
     } else {
       result.push(line);
     }
     return result;
   }, []);
+
 
 
   // Wrap each line
