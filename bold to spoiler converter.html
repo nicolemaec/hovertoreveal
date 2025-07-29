@@ -56,40 +56,30 @@
   <textarea id="outputText" placeholder="Converted output will appear here..."></textarea>
 
   <script>
-    function convertText() {
-      const inputDiv = document.getElementById('inputArea');
-      let html = inputDiv.innerHTML;
+function convertText() {
+  const inputDiv = document.getElementById('inputArea');
+  let html = inputDiv.innerHTML;
 
-      // Convert inline bold styles to <b> for compatibility
-      html = html.replace(/<span[^>]*?style=["'][^"']*?font-weight\s*:\s*bold;?[^"']*?["'][^>]*?>(.*?)<\/span>/gi, '<b>$1</b>');
+  // Convert inline bold styles to <b> for compatibility
+  html = html.replace(/<span[^>]*?style=["'][^"']*?font-weight\s*:\s*bold;?[^"']*?["'][^>]*?>(.*?)<\/span>/gi, '<b>$1</b>');
 
-      // Replace <b> and <strong> with spoiler spans
-      html = html.replace(/<(b|strong)>/gi, '<span class="spoiler">');
-      html = html.replace(/<\/(b|strong)>/gi, '</span>');
+  // Replace <b> and <strong> with spoiler spans
+  html = html.replace(/<(b|strong)>/gi, '<span class="spoiler">');
+  html = html.replace(/<\/(b|strong)>/gi, '</span>');
 
-      // Split content by block-level tags or line breaks
-      const temp = document.createElement('div');
-      temp.innerHTML = html;
-      const lines = [];
+  // Split ONLY by <br> (no duplicate collection from <p> or <div>)
+  const lines = html.split(/<br\s*\/?>/i)
+    .map(line => line.trim())
+    .filter(line => line.length > 0);
 
-      // Grab paragraphs, divs, or split by <br>
-      temp.querySelectorAll('p, div').forEach(el => {
-        const content = el.innerHTML.trim();
-        if (content) lines.push(content);
-      });
+  // Wrap each line
+  const converted = lines.map(line => {
+    return `<div class="note">\n  <label>\n    <input type="checkbox" class="line-toggle">\n    ${line}\n  </label>\n</div>`;
+  }).join('\n\n');
 
-      html.split(/<br\s*\/?>/i).forEach(raw => {
-        const trimmed = raw.trim();
-        if (trimmed && !lines.includes(trimmed)) lines.push(trimmed);
-      });
+  document.getElementById('outputText').value = converted;
+}
 
-      // Wrap each line
-      const converted = lines.map(line => {
-        return `<div class="note">\n  <label>\n    <input type="checkbox" class="line-toggle">\n    ${line}\n  </label>\n</div>`;
-      }).join('\n\n');
-
-      document.getElementById('outputText').value = converted;
-    }
   </script>
 </body>
 </html>
