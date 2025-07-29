@@ -60,12 +60,20 @@ function convertText() {
   const inputDiv = document.getElementById('inputArea');
   let html = inputDiv.innerHTML;
 
-  // Convert inline bold styles to <b> for compatibility
-  html = html.replace(/<span[^>]*?style=["'][^"']*?font-weight\s*:\s*bold;?[^"']*?["'][^>]*?>(.*?)<\/span>/gi, '<b>$1</b>');
+// Remove Word-specific junk
+html = html.replace(/<o:p>\s*<\/o:p>/gi, '');
+html = html.replace(/<o:p>.*?<\/o:p>/gi, '');
+html = html.replace(/\sclass=("MsoNormal"|[^"']*)/gi, '');
+html = html.replace(/<p[^>]*>/gi, '');
+html = html.replace(/<\/p>/gi, '<br>');
 
-  // Replace <b> and <strong> with spoiler spans
-  html = html.replace(/<(b|strong)>/gi, '<span class="spoiler">');
-  html = html.replace(/<\/(b|strong)>/gi, '</span>');
+// Convert inline bold styles to <b>
+html = html.replace(/<span[^>]*?style=["'][^"']*?font-weight\s*:\s*bold;?[^"']*?["'][^>]*?>(.*?)<\/span>/gi, '<b>$1</b>');
+
+// Replace <b> and <strong> with spoiler spans
+html = html.replace(/<(b|strong)>/gi, '<span class="spoiler">');
+html = html.replace(/<\/(b|strong)>/gi, '</span>');
+
 
   // Split ONLY by <br> (no duplicate collection from <p> or <div>)
   const lines = html.split(/<br\s*\/?>/i)
