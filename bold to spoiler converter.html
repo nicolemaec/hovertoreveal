@@ -60,20 +60,9 @@ function convertText() {
   const inputDiv = document.getElementById('inputArea');
   let html = inputDiv.innerHTML;
 
-// Remove Word-specific junk
-html = html.replace(/<o:p>\s*<\/o:p>/gi, '');
-html = html.replace(/<o:p>.*?<\/o:p>/gi, '');
-html = html.replace(/\sclass=("MsoNormal"|[^"']*)/gi, '');
-html = html.replace(/<p[^>]*>/gi, '');
-html = html.replace(/<\/p>/gi, '<br>');
-
-// Convert inline bold styles to <b>
-html = html.replace(/<span[^>]*?style=["'][^"']*?font-weight\s*:\s*bold;?[^"']*?["'][^>]*?>(.*?)<\/span>/gi, '<b>$1</b>');
-
-// Replace <b> and <strong> with spoiler spans
-html = html.replace(/<(b|strong)>/gi, '<span class="spoiler">');
-html = html.replace(/<\/(b|strong)>/gi, '</span>');
-
+// Convert <strong> (and <b>) to spoiler spans
+html = html.replace(/<(?:b|strong)>/gi, '<span class="spoiler">');
+html = html.replace(/<\/(?:b|strong)>/gi, '</span>');
 
 // Split ONLY by <br>, but do NOT split inside tables
 const lines = html
@@ -97,9 +86,6 @@ const lines = html
     return result;
   }, []);
 
-
-
-
   // Wrap each line
   const converted = lines.map(line => {
     return `<div class="note">\n  <label>\n    <input type="checkbox" class="line-toggle">\n    ${line}\n  </label>\n</div>`;
@@ -111,3 +97,4 @@ const lines = html
   </script>
 </body>
 </html>
+
